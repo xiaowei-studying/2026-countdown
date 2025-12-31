@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年元旦倒计时</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .countdown-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 90%;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 215, 0, 0.7);
+            }
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .time-segment {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            min-width: 100px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .time-segment:hover {
+            transform: translateY(-5px);
+        }
+        
+        .time-value {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            display: block;
+        }
+        
+        .time-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .message {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .share-button {
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .share-button:hover {
+            background-color: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 庆祝效果样式 */
+        .celebration {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .new-year-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #fff;
+            padding: 2rem 3rem;
+            font-size: 3rem;
+            font-weight: bold;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+            z-index: 2000;
+            animation: zoomIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes zoomIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* 烟花效果 */
+        .firework {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: firework-animation 1.5s ease-out infinite;
+        }
+        
+        @keyframes firework-animation {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        /* 星星背景动画 */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .time-value {
+                font-size: 2rem;
+            }
+            
+            .time-segment {
+                min-width: 80px;
+                padding: 1rem;
+            }
+            
+            .new-year-message {
+                font-size: 2rem;
+                padding: 1.5rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <div class="countdown-container">
+        <h1>2026年元旦倒计时</h1>
+        
+        <div class="timer">
+            <div class="time-segment">
+                <span class="time-value" id="days">000</span>
+                <span class="time-label">天</span>
+            </div>
+            <div class="time-segment">
+                <span class="time-value" id="hours">00</span>
+                <span class="time-label">时</span>
+            </div>
+            <div class="time-segment">
+                <span class="time-value" id="minutes">00</span>
+                <span class="time-label">分</span>
+            </div>
+            <div class="time-segment">
+                <span class="time-value" id="seconds">00</span>
+                <span class="time-label">秒</span>
+            </div>
+        </div>
+        
+        <div class="message">
+            距离2026年1月1日00:00:00还有
+        </div>
+        
+        <button class="share-button" id="shareButton">分享给朋友</button>
+    </div>
+    
+    <!-- 庆祝层 -->
+    <div class="celebration" id="celebration"></div>
+    
+    <!-- 新年消息弹窗 -->
+    <div class="new-year-message" id="newYearMessage">刘胡伟祝你新年快乐！</div>
+    
+    <script>
+        // 创建星星背景
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numberOfStars = 100;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // 随机位置
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                
+                // 随机大小
+                const size = Math.random() * 3;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                // 随机动画延迟
+                star.style.animationDelay = Math.random() * 3 + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // 创建烟花
+        function createFirework() {
+            const celebration = document.getElementById('celebration');
+            const colors = ['#ff0', '#f00', '#00f', '#0f0', '#f0f', '#0ff', '#ffa500', '#ff69b4'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 在屏幕上的随机位置创建烟花
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            
+            // 创建多个粒子
+            for (let i = 0; i < 30; i++) {
+                const firework = document.createElement('div');
+                firework.classList.add('firework');
+                
+                // 设置粒子初始位置
+                firework.style.left = x + 'px';
+                firework.style.top = y + 'px';
+                firework.style.backgroundColor = color;
+                
+                // 设置随机移动方向
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 200 + 50;
+                const xMove = Math.cos(angle) * distance;
+                const yMove = Math.sin(angle) * distance;
+                
+                firework.style.setProperty('--x', xMove + 'px');
+                firework.style.setProperty('--y', yMove + 'px');
+                
+                celebration.appendChild(firework);
+                
+                // 动画结束后删除元素
+                setTimeout(() => {
+                    firework.remove();
+                }, 1500);
+            }
+        }
+        
+        // 分享功能
+        function setupSharing() {
+            const shareButton = document.getElementById('shareButton');
+            
+            if (navigator.share) {
+                shareButton.addEventListener('click', () => {
+                    navigator.share({
+                        title: '2026年元旦倒计时',
+                        text: '快来和我一起倒数2026年元旦！',
+                        url: window.location.href
+                    }).catch(err => console.log('分享失败:', err));
+                });
+            } else {
+                shareButton.addEventListener('click', () => {
+                    // 复制链接到剪贴板
+                    const url = window.location.href;
+                    navigator.clipboard.writeText(url).then(() => {
+                        shareButton.textContent = '链接已复制！';
+                        setTimeout(() => {
+                            shareButton.textContent = '分享给朋友';
+                        }, 2000);
+                    }).catch(err => {
+                        console.log('复制失败:', err);
+                        // 显示手动复制选项
+                        alert('请手动复制链接分享给朋友：' + url);
+                    });
+                });
+            }
+        }
+        
+        // 倒计时功能
+        function setupCountdown() {
+            // 目标时间：2026年1月1日 00:00:00
+            const targetDate = new Date('2026-01-01T00:00:00');
+            
+            function updateCountdown() {
+                const now = new Date();
+                const timeLeft = targetDate.getTime() - now.getTime();
+                
+                if (timeLeft > 0) {
+                    // 计算剩余时间
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    
+                    // 更新显示
+                    document.getElementById('days').textContent = String(days).padStart(3, '0');
+                    document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+                } else {
+                    // 倒计时结束，显示庆祝效果
+                    showCelebration();
+                }
+            }
+            
+            // 立即更新一次，然后每秒更新
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+        
+        // 显示庆祝效果
+        function showCelebration() {
+            // 显示庆祝层
+            document.getElementById('celebration').style.display = 'flex';
+            
+            // 显示新年消息
+            setTimeout(() => {
+                document.getElementById('newYearMessage').style.display = 'block';
+            }, 500);
+            
+            // 创建大量烟花
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    createFirework();
+                }, i * 100);
+            }
+            
+            // 持续创建烟花
+            const fireworkInterval = setInterval(() => {
+                createFirework();
+            }, 2000);
+            
+            // 5分钟后停止烟花
+            setTimeout(() => {
+                clearInterval(fireworkInterval);
+            }, 300000);
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            setupCountdown();
+            setupSharing();
+        });
+    </script>
+</body>
+</html>
